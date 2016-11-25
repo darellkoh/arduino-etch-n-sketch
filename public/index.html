@@ -1,0 +1,129 @@
+<html>
+<head>
+    <script src="/js/vendor/socket.io-client/socket.io.js"></script>
+    <style>
+    body {
+        background: #fff;
+        padding: 0;
+        margin: 0;
+    }
+
+    #sketch {
+        height: 1023px;
+        width: 1023px;
+        background: #fff;
+    }
+
+    .marker {
+        width: 40px;
+        height: 40px;
+        float: left;
+    }
+
+    input {
+        width: 100px;
+        height: 50px;
+        float: right;
+    }
+
+    #color-selector {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 120px;
+        background: black;
+    }
+
+    #purple {
+        background: purple;
+    }
+
+    #red {
+        background: red;
+    }
+
+    #blue {
+        background: blue;
+    }
+
+    #green {
+        background: green;
+    }
+
+    #orange {
+        background: orange;
+    }
+
+    #yellow {
+        background: yellow;
+    }
+
+    #brown {
+        background: brown;
+    }
+
+    #lime-green {
+        background: #99CC33;
+    }
+    </style>
+</head>
+
+<body>
+    <div id="sketch">
+        <canvas id="paint"></canvas>
+        <input id="brush-width" type="range" min="1" max="100"></input>
+        <div id="color-selector">
+            <div class="marker selected" id="black"></div>
+            <div class="marker" id="purple"></div>
+            <div class="marker" id="red"></div>
+            <div class="marker" id="blue"></div>
+            <div class="marker" id="green"></div>
+            <div class="marker" id="orange"></div>
+            <div class="marker" id="yellow"></div>
+            <div class="marker" id="brown"></div>
+            <div class="marker" id="lime-green"></div>
+        </div>
+    </div>
+    <script>
+    var socket = io.connect(window.document.location.origin);
+    socket.on('stuff', onStuff);
+
+    var canvas = document.querySelector('#paint');
+    var ctx = canvas.getContext('2d');
+    var sketch = document.querySelector('#sketch');
+    var sketch_style = getComputedStyle(sketch);
+    var lastPosition = {
+        x: 0,
+        y: 0
+    };
+
+    // Drawing on Paint App
+    ctx.lineWidth = 5;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'blue';
+
+    canvas.width = parseInt(sketch_style.getPropertyValue('width'));
+    canvas.height = parseInt(sketch_style.getPropertyValue('height'));
+
+    function onStuff(newPosition) {
+        ctx.beginPath();
+        ctx.moveTo(lastPosition.x, lastPosition.y);
+        ctx.lineTo(newPosition.x, newPosition.y);
+        ctx.closePath();
+        ctx.stroke();
+        lastPosition = newPosition;
+    }
+
+    document.getElementById('color-selector').onclick = function(e) {
+        ctx.strokeStyle = e.target.id;
+    };
+
+    document.getElementById('brush-width').oninput = function(e) {
+        ctx.lineWidth = e.target.value;
+    };
+    </script>
+</body>
+
+</html>
